@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <canvas id="canvas1" width="300" height="300" style=" background-color:rgb(247,248,242);"></canvas>
+    <script>
+
+        var data = [{ x: 23 }, { x: 34 }, { x: 60 }, { x: 90 }, { x: 40 }];
+        var colors = ["rgb(63,170,150)", "rgb(255,181,39)", "rgb(237,111,71)", "rgb(188,60,109)", "rgb(248,61,61)", "rgb(50,155,125)", "rgb(243,125,123)", "rgb(240,80,82)"];
+
+
+
+        var canvas = document.getElementById('canvas1');
+        if (canvas.getContext) {
+            var ctx = canvas.getContext('2d');
+
+            var center = { x: transferToPixWidth(50), y: transferToPixHeight(50) };
+            var startLine = transferToPixWidth(10);
+            var textY = transferToPixWidth(48);
+            var done = 0;
+
+
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, transferToPixWidth(6), 0, Math.PI * 2, true); // Outer circle
+            ctx.fillStyle = "rgb(120,109,103)";
+            ctx.fill();
+
+
+            ctx.beginPath();
+            ctx.moveTo(center.x, center.y);
+            ctx.lineTo(startLine, center.y);
+            ctx.strokeStyle = "rgb(120,109,103)";
+            ctx.lineWidth = transferToPixWidth(0.25);
+            ctx.stroke();
+            var fontSize =transferToPixWidth(3)+ "px";
+            ctx.font = fontSize+" Franklin Gothic Book";
+            ctx.fillStyle = "rgb(91,82,77)";
+            ctx.fillText("GENERAL", startLine, textY);
+
+            var startAngle = 0; // Starting point on circle
+            var endAngle = Math.PI; // End point on circle
+
+
+            var internalRad = transferToPixWidth(10);
+            var maxCount = data.length;
+            var maxRad = internalRad + (maxCount * transferToPixWidth(2)) + transferToPixWidth(7);
+
+            var startx = transferToPixWidth(10);
+            var index = 0;
+            data.forEach(function (element, index, array) {
+                buildChart(element.x, colors[index], internalRad, maxRad);
+                internalRad += transferToPixWidth(2);
+                index++;
+            });
+
+        }
+
+
+        function buildChart(complete, color, radius, maxRadius) {
+
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, radius, Math.PI, getRadByPersantage(complete), false);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = transferToPixWidth(1);
+            ctx.stroke();
+            drawLineAnnotation(ctx, radius, maxRadius, getRadByPersantage(complete),complete);
+
+        }
+
+
+        function buildSmallChart(x,complete, color, radius, maxRadius) {
+
+            ctx.beginPath();
+            ctx.arc(center.x, transferToPixWidth(58), 20, 0, 2 * Math.PI, false);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = transferToPixWidth(1);
+            ctx.stroke();
+        }
+
+
+
+        function drawLineAnnotation(ctx, innerRadius, outerRadius, rad,complete) {
+   
+            var c = Math.cos(rad);
+            var s = Math.sin(rad);
+            var innerPointX = center.x + (innerRadius * c);
+            var innerPointY = center.y + (innerRadius * s);
+            var outerPointX = center.x + (outerRadius * c);
+            var outerPointY = center.y + (outerRadius * s);
+            ctx.lineTo(outerPointX, outerPointY);
+            ctx.lineWidth = transferToPixWidth(0.25);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(outerPointX, outerPointY);
+            ctx.lineTo(outerPointX, outerPointY - transferToPixWidth(2));
+            ctx.lineTo(outerPointX - transferToPixWidth(2), outerPointY - transferToPixWidth(2));
+            ctx.lineTo(outerPointX - transferToPixWidth(2), outerPointY - transferToPixWidth(8));
+            ctx.lineTo(outerPointX + transferToPixWidth(9), outerPointY - transferToPixWidth(8));
+            ctx.lineTo(outerPointX + transferToPixWidth(9), outerPointY - transferToPixWidth(2));
+            ctx.lineTo(outerPointX + transferToPixWidth(2.2), outerPointY - transferToPixWidth(2));
+            ctx.lineTo(outerPointX, outerPointY);
+            ctx.fillStyle = "rgb(91,82,77)";
+            ctx.fill();
+
+            ctx.font =transferToPixWidth(3.5)+ "px Franklin Gothic Book";
+
+            ctx.fillStyle = "white";
+            ctx.textAlign = 'center';
+            ctx.fillText(Math.round(complete) + "%", outerPointX + transferToPixWidth(3.5), outerPointY - transferToPixWidth(3.6));
+
+        }
+
+        function getRadByPersantage(val) {
+            var percentDone = val;
+            var angleOfPercentDone = percentDone * 270 / 100;
+            angleOfPercentDone -= 180;
+            var rad = angleOfPercentDone * Math.PI / 180;
+            return rad;
+        }
+
+
+        function getPersentFromPi(val) {
+            var result = Math.PI+ (val * 2 * Math.PI) / 100;
+            return result;
+
+        }
+
+
+        function transferToPixHeight(val) {
+            var clientHeight = canvas.clientHeight;
+            var result = (val * clientHeight) / 100;
+            return result;
+        }
+
+        function transferToPixWidth(val) {
+            var clientWidth = canvas.clientWidth;
+            var result = (val * clientWidth) / 100;
+            return result;
+        }
+    </script>
+</body>
+</html>
